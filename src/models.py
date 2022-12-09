@@ -8,31 +8,42 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+class User(Base):
+    __tablename__ = 'user'
+    user_id = Column(Integer, primary_key=True)
+    username = Column(String(80), nullable=False, unique=True)
+    firstname = Column(String(80), nullable=False)
+    lastname = Column(String(80), nullable=False)
+    email = Column(String(250), nullable=False, unique=True)
+    created_at = Column(String(250))
+    updated_at = Column(String(250))
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+class Post(Base):
+    __tablename__ = 'post'
+    post_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.user_id'))
+    comment = Column(String(250))
+    created_at = Column(String(250))
+    updated_at = Column(String(250))
+    total_likes = Column(Integer)
+
+class PostComment(Base):
+    __tablename__ = 'postComment'
+    comment_id = Column(Integer, primary_key=True)
+    author_comment_id = Column(Integer, ForeignKey('user.user_id'))
+    comment_text = Column(String(250))
+    post_id = Column(Integer, ForeignKey('post.post_id'))
+    
+
+class Likes(Base):
+    __tablename__ = 'likes'
+    like_id = Column(Integer, primary_key=True)
+    post_id = Column(Integer, ForeignKey('post.post_id'))
+    user_likeit_id = Column(Integer, ForeignKey('user.user_id'))
+   
 
     def to_dict(self):
         return {}
 
 ## Draw from SQLAlchemy base
-try:
-    result = render_er(Base, 'diagram.png')
-    print("Success! Check the diagram.png file")
-except Exception as e:
-    print("There was a problem genering the diagram")
-    raise e
+render_er(Base, 'diagram.png')
